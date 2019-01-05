@@ -507,7 +507,5 @@ return z;
                     let dot = esgraph.dot(cfg , { counter: 0, source: codeToParse }).replace(/([n](\d+)[ ][-][>][ ][n](\d+)[ ][[]\w*(color="red", label="exception"]))/g, '');
                     let dotToTest = dot.replace(/\s+/g, '')
                     let modeToTest= mod.replace(/\s+/g, '')
-                    console.log(dotToTest);
-
                             assert.equal(dotToTest, modeToTest );
                         })});
