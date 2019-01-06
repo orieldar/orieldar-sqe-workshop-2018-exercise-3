@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {parseCode, firstRun, secondRun, updateCFG, colorCFG} from '../src/js/code-analyzer';
+import {parseCode, firstRun, secondRun, updateCFG, colorCFG, updateIfColors,updateWhileColors ,updateIfCFG, updateWhileCFG, ifHandler} from '../src/js/code-analyzer';
 import * as astring from 'astring';
 import * as esprima from 'esprima';
 const esgraph = require('esgraph');
@@ -412,6 +412,10 @@ function foo(x, y, z) {
         let dotToTest = dot.replace(/\s+/g, '')
         let modeToTest= mod.replace(/\s+/g, '')
 
+        //updateIfColors(["red", "red", "red"]);
+        //let node = cfg[0].normal;
+        //updateIfCFG(node,0,1);
+
 
                     assert.equal(dotToTest, modeToTest );
                 })});
@@ -509,3 +513,51 @@ return z;
                     let modeToTest= mod.replace(/\s+/g, '')
                             assert.equal(dotToTest, modeToTest );
                         })});
+
+                        describe('(14) The javascript program', () => {
+                            it('checks specific cfg functions correctly if true', () => {
+                    let inputVector = [1,2,3];
+                    let env = new Map();
+                    let argenv = new Map ();
+                    let codeToParse = `
+                    function foo(x, y, z){
+                        let a = x + 1;
+                        let b = a + y;
+                        let c = 0;
+
+                        if (b < z) {
+                            c = c + 5;
+                        } else if (b < z * 2) {
+                            c = c + x + 5;
+                        } else {
+                            c = c + z + 5;
+                        }
+
+                        return c;
+                    }
+
+                `;
+
+
+                    let beforechange =  esprima.parseScript(codeToParse, { range: true });
+                    let parsedCode = parseCode(codeToParse,inputVector);
+                    let cfgBody = beforechange.body[0].body;
+                    let cfg = esgraph(cfgBody);
+                    updateCFG(cfg[2],parsedCode);
+                    colorCFG(cfg[0].normal);
+                    let dot = esgraph.dot(cfg , { counter: 0, source: codeToParse }).replace(/([n](\d+)[ ][-][>][ ][n](\d+)[ ][[]\w*(color="red", label="exception"]))/g, '');
+
+
+                    updateIfColors(["red", "red", "red"]);
+                    let node = cfg[0].normal;
+                    node.false= cfg[1];
+                    node.true = cfg[0].normal.normal
+                    updateIfCFG(node,0,1);
+                    ifHandler(node);
+                    node.normal = undefined;
+                    colorCFG(node);
+                    updateWhileColors(["red", "red", "red"]);
+
+
+                                assert.equal(updateWhileCFG(node,0,1), 0 );
+                            })});

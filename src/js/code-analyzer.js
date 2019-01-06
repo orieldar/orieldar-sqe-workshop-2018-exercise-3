@@ -167,6 +167,15 @@ let colorCFG = (node) =>{
     }
 };
 
+let updateIfColors= (arr) =>{
+    ifColors = arr;
+};
+
+let updateWhileColors= (arr) =>{
+    whileColors = arr;
+};
+
+
 let normalHandler = (node) => {
     node.label = node.label + addGreen;
     if( node.astNode.type == 'ReturnStatement')
@@ -287,7 +296,10 @@ const parseCode = (codeToParse, inputVector) => {
     return newTree;
 };
 
-
+export {updateIfColors, updateWhileColors};
+export {ifHandler};
+export {updateIfCFG};
+export {updateWhileCFG};
 export {greenLines};
 export {redLines};
 export {parseCode};
